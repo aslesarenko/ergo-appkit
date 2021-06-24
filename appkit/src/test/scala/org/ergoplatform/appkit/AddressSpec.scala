@@ -12,18 +12,34 @@ import sigmastate.serialization.ErgoTreeSerializer
 class AddressSpec extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks
   with AppkitTesting {
 
-  property("encoding vector") {
-    val addr = Address.create(addrStr)
+  def checkIsTestnetP2PKAddress(addr: Address) = {
     addr.isMainnet shouldBe false
     addr.isP2PK shouldBe true
+    addr.getNetworkType shouldBe NetworkType.TESTNET
+    addr.getErgoAddress.networkPrefix shouldBe ErgoAddressEncoder.TestnetNetworkPrefix
+  }
+
+  property("encoding vector") {
+    val addr = Address.create(addrStr)
     addr.toString shouldBe addrStr
+    checkIsTestnetP2PKAddress(addr)
   }
 
   property("Address fromMnemonic") {
     val addr = Address.fromMnemonic(NetworkType.TESTNET, mnemonic, SecretString.empty())
     addr.toString shouldBe addrStr
+    checkIsTestnetP2PKAddress(addr)
+
     val addr2 = Address.fromMnemonic(NetworkType.MAINNET, mnemonic, SecretString.empty())
     addr2.toString shouldNot be (addrStr)
+  }
+
+  property("Address from ErgoAddress") {
+    implicit val encoder: ErgoAddressEncoder = ErgoAddressEncoder(ErgoAddressEncoder.TestnetNetworkPrefix);
+    val ergoAddr = encoder.fromString(addrStr).get
+    val addr = new Address(ergoAddr)
+    checkIsTestnetP2PKAddress(addr)
+    addr.toString shouldBe addrStr
   }
 
   property("Address createEip3Address") {

@@ -1,21 +1,26 @@
 package org.ergoplatform.restapi.client;
 
+import org.ergoplatform.restapi.client.ApiClient;
+import org.ergoplatform.restapi.client.ApiError;
+import org.ergoplatform.restapi.client.NodeInfo;
 import org.junit.Before;
 import org.junit.Test;
-import retrofit2.Response;
+import org.junit.Assert;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 
 /**
  * API tests for InfoApi
  */
-public class InfoApiTest {
+public class InfoApiTest extends PeerFinder {
 
     private InfoApi api;
 
     @Before
     public void setup() {
-        api = new ApiClient("http://localhost:9052/").createService(InfoApi.class);
+        ApiClient client = findPeer(true);
+        api = client.createService(InfoApi.class);
     }
 
 
@@ -25,12 +30,9 @@ public class InfoApiTest {
      * 
      */
     @Test
-    public void getNodeInfoTest() {
-        try {
-            Response<NodeInfo> response = api.getNodeInfo().execute();
-            System.out.println(response.body().toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void getNodeInfoTest() throws IOException {
+        NodeInfo response = api.getNodeInfo().execute().body();
+        assertNotNull(response);
+        assertTrue(response.getFullHeight() > 500000);
     }
 }

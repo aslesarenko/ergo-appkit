@@ -80,6 +80,6 @@ public class Mnemonic {
 
     public byte[] toSeed() {
         Option<String> passOpt = Iso.arrayCharToOptionString().to(getPassword());
-        return org.ergoplatform.wallet.mnemonic.Mnemonic.toSeed(String.valueOf(_phrase), passOpt);
+        return JavaHelpers.mnemonicToSeed(String.valueOf(_phrase), passOpt);
     }
 }

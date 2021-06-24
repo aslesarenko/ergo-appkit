@@ -122,7 +122,7 @@ assemblyMergeStrategy in assembly := {
 
 lazy val allConfigDependency = "compile->compile;test->test"
 
-val sigmaStateVersion = "4.0.3"
+val sigmaStateVersion = "4.0.4"
 val ergoWalletVersion = "4.0.12"
 lazy val sigmaState = ("org.scorexfoundation" %% "sigma-state" % sigmaStateVersion).force()
     .exclude("ch.qos.logback", "logback-classic")
@@ -154,6 +154,7 @@ val apiClientDeps = Seq(
   "com.squareup.retrofit2" % "converter-scalars" % "2.6.2",
   "com.squareup.retrofit2" % "converter-gson" % "2.6.2",
   "junit" % "junit" % "4.12" % "test",
+  "com.novocode" % "junit-interface" % "0.11" % Test
 )
 
 lazy val javaClientGenerated = (project in file("java-client-generated"))
@@ -162,6 +163,7 @@ lazy val javaClientGenerated = (project in file("java-client-generated"))
       name := "java-client-generated",
       crossPaths := false,
       libraryDependencies ++= apiClientDeps,
+      testOptions += Tests.Argument(TestFrameworks.JUnit),
       publishArtifact in (Compile, packageDoc) := false,
       publish / skip := true
     )

@@ -1,18 +1,29 @@
 package org.ergoplatform.restapi.client;
 
+import org.ergoplatform.restapi.client.ApiClient;
+import org.ergoplatform.restapi.client.ApiError;
+import org.ergoplatform.restapi.client.ErgoTransaction;
+import org.ergoplatform.restapi.client.InlineResponse2005;
+import org.ergoplatform.restapi.client.InlineResponse2006;
+import org.ergoplatform.restapi.client.PowSolutions;
+import org.ergoplatform.restapi.client.WorkMessage;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+
+import static org.junit.Assert.*;
 
 /**
  * API tests for MiningApi
  */
-public class MiningApiTest {
+public class MiningApiTest extends PeerFinder {
 
     private MiningApi api;
 
     @Before
     public void setup() {
-        api = new ApiClient("http://localhost:9052/").createService(MiningApi.class);
+        api = findPeer(true).createService(MiningApi.class);
     }
 
 
@@ -22,10 +33,20 @@ public class MiningApiTest {
      * 
      */
     @Test
-    public void miningReadMinerRewardAddressTest() {
-        // InlineResponse2004 response = api.miningReadMinerRewardAddress();
+    public void miningReadMinerRewardAddressTest() throws IOException {
+        InlineResponse2005 response = api.miningReadMinerRewardAddress().execute().body();
+        assertNull(response);
+    }
 
-        // TODO: test validations
+    /**
+     * Read public key associated with miner rewards
+     *
+     * 
+     */
+    @Test
+    public void miningReadMinerRewardPubkeyTest() throws IOException {
+        InlineResponse2006 response = api.miningReadMinerRewardPubkey().execute().body();
+        assertNull(response);
     }
 
     /**
@@ -34,10 +55,20 @@ public class MiningApiTest {
      * 
      */
     @Test
-    public void miningRequestBlockCandidateTest() {
-        // ExternalCandidateBlock response = api.miningRequestBlockCandidate();
+    public void miningRequestBlockCandidateTest() throws IOException {
+        WorkMessage response = api.miningRequestBlockCandidate().execute().body();
+        assertNull(response);
+    }
 
-        // TODO: test validations
+    /**
+     * Request block candidate
+     *
+     * 
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void miningRequestBlockCandidateWithMandatoryTransactionsTest() throws IOException {
+        java.util.List<ErgoTransaction> body = null;
+        WorkMessage response = api.miningRequestBlockCandidateWithMandatoryTransactions(body).execute().body();
     }
 
     /**
@@ -45,11 +76,9 @@ public class MiningApiTest {
      *
      * 
      */
-    @Test
-    public void miningSubmitSolutionTest() {
+    @Test(expected = IllegalArgumentException.class)
+    public void miningSubmitSolutionTest() throws IOException {
         PowSolutions body = null;
-        // Void response = api.miningSubmitSolution(body);
-
-        // TODO: test validations
+        Void response = api.miningSubmitSolution(body).execute().body();
     }
 }

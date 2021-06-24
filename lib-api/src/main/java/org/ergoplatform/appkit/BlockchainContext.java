@@ -81,10 +81,5 @@ public interface BlockchainContext {
      * Get unspent boxes owned by the given address
      */
     List<InputBox> getUnspentBoxesFor(Address address);
-
-    /**
-     * Get unspent boxes protected by given ergo tree template
-     */
-    List<InputBox> getUnspentBoxesForErgoTreeTemplate(ErgoTreeTemplate template);
 }
 

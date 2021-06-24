@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import org.ergoplatform.ErgoLikeTransaction;
 import org.ergoplatform.appkit.*;
 import org.ergoplatform.explorer.client.ExplorerApiClient;
-import org.ergoplatform.explorer.client.model.TransactionOutput;
+import org.ergoplatform.explorer.client.model.OutputInfo;
 import org.ergoplatform.restapi.client.*;
 import retrofit2.Retrofit;
 import sigmastate.Values;
@@ -100,9 +100,9 @@ public class BlockchainContextImpl implements BlockchainContext {
     /**
      * This method should be private. No classes of HTTP client should ever leak into interfaces.
      */
-    private List<InputBox> getInputBoxes(List<TransactionOutput> boxes) {
+    private List<InputBox> getInputBoxes(List<OutputInfo> boxes) {
         return boxes.stream().map(box -> {
-            String boxId = box.getId();
+            String boxId = box.getBoxId();
             ErgoTransactionOutput boxInfo = ErgoNodeFacade.getBoxById(_retrofit, boxId);
             return new InputBoxImpl(this, boxInfo);
         }).collect(Collectors.toList());
@@ -112,7 +112,7 @@ public class BlockchainContextImpl implements BlockchainContext {
         return _nodeInfo;
     }
 
-    public PreHeader getPreHeader() {
+    public org.ergoplatform.appkit.PreHeader getPreHeader() {
         return _preHeader;
     }
 
@@ -160,16 +160,8 @@ public class BlockchainContextImpl implements BlockchainContext {
 
     @Override
     public List<InputBox> getUnspentBoxesFor(Address address) {
-        List<TransactionOutput> boxes = ExplorerFacade
+        List<OutputInfo> boxes = ExplorerFacade
                 .transactionsBoxesByAddressUnspentIdGet(_retrofitExplorer, address.toString());
-        return getInputBoxes(boxes);
-    }
-
-    @Override
-    public List<InputBox> getUnspentBoxesForErgoTreeTemplate(ErgoTreeTemplate template) {
-        List<TransactionOutput> boxes = ExplorerFacade
-                .transactionsBoxesByErgoTreeTemplateUnspentErgoTreeTemplateGet(_retrofitExplorer,
-                        template.getEncodedBytes());
         return getInputBoxes(boxes);
     }
 }

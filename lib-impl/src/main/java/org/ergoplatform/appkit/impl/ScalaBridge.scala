@@ -1,7 +1,7 @@
 package org.ergoplatform.appkit.impl
 
 import _root_.org.ergoplatform.restapi.client._
-import org.ergoplatform.explorer.client.model.{Asset => EAsset, Registers => ERegisters}
+import org.ergoplatform.explorer.client.model.{AssetInfo => EAsset, AdditionalRegisters => ERegisters}
 
 import java.util
 import java.util.stream.Collectors
@@ -10,7 +10,7 @@ import java.util.{List, ArrayList}
 import org.ergoplatform.ErgoBox.{NonMandatoryRegisterId, TokenId}
 import org.ergoplatform.{DataInput, ErgoLikeTransaction, ErgoBox, Input}
 import org.ergoplatform.appkit.{Iso, ErgoToken, JavaHelpers}
-import org.ergoplatform.explorer.client.model.TransactionOutput
+import org.ergoplatform.explorer.client.model.OutputInfo
 import org.ergoplatform.settings.ErgoAlgos
 import special.sigma.Header
 import scorex.crypto.authds.{ADDigest, ADKey}
@@ -151,7 +151,7 @@ object ScalaBridge {
           .additionalRegisters(regs)
           .creationHeight(box.creationHeight)
           .transactionId(box.transactionId)
-          .index(box.index)
+          .index(Integer.valueOf(box.index))
       out
     }
   }
@@ -200,7 +200,7 @@ object ScalaBridge {
         minerPk = h.getPowSolutions.getPk.toGroupElement,
         powOnetimePk = h.getPowSolutions.getW.toGroupElement,
         powNonce = h.getPowSolutions.getN.toColl,
-        powDistance = SigmaDsl.BigInt(h.getPowSolutions.getD.toBigIntegerExact),
+        powDistance = SigmaDsl.BigInt(h.getPowSolutions.getD),
         votes = h.getVotes.toColl
       )
 

@@ -1,20 +1,26 @@
 package org.ergoplatform.restapi.client;
 
+import org.ergoplatform.restapi.client.ApiClient;
+import org.ergoplatform.restapi.client.ApiError;
+import org.ergoplatform.restapi.client.ErgoTransactionOutput;
+import org.ergoplatform.restapi.client.SerializedBox;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.junit.Assert.*;
+
 /**
  * API tests for UtxoApi
  */
-public class UtxoApiTest {
+public class UtxoApiTest extends PeerFinder {
 
     private UtxoApi api;
 
     @Before
     public void setup() {
-        api = new ApiClient("http://localhost:9052/").createService(UtxoApi.class);
+        api = findPeer(true).createService(UtxoApi.class);
     }
 
 
@@ -24,10 +30,10 @@ public class UtxoApiTest {
      * 
      */
     @Test
-    public void genesisBoxesTest() {
-        // List<ErgoTransactionOutput> response = api.genesisBoxes();
-
-        // TODO: test validations
+    public void genesisBoxesTest() throws IOException {
+        java.util.List<ErgoTransactionOutput> response = api.genesisBoxes().execute().body();
+        assertNotNull(response);
+        assertTrue(response.size() > 0);
     }
 
     /**
@@ -36,26 +42,46 @@ public class UtxoApiTest {
      * 
      */
     @Test
-    public void getBoxByIdTest() {
-        String boxId = "83b94f2df7e97586a9fe8fe43fa84d252aa74ecee5fe0871f85a45663927cd9a";
-        try {
-            ErgoTransactionOutput response = api.getBoxById(boxId).execute().body();
-            System.out.println(response.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void getBoxByIdTest() throws IOException {
+        ErgoTransactionOutput response = api.getBoxById(boxId).execute().body();
+        assertNotNull(response);
+        assertEquals(boxId, response.getBoxId());
+        assertEquals(ergoTree, response.getErgoTree());
     }
 
     /**
-     * Get serialized box in Base16 encoding for a box with given unique identifier.
+     * Get serialized box from UTXO pool in Base16 encoding by an identifier.
      *
      * 
      */
     @Test
-    public void getBoxByIdBinaryTest() {
-        String boxId = null;
-        // SerializedBox response = api.getBoxByIdBinary(boxId);
+    public void getBoxByIdBinaryTest() throws IOException {
+        SerializedBox response = api.getBoxByIdBinary(boxId).execute().body();
+        assertNotNull(response);
+        assertTrue(response.getBytes().length() > 10);
+    }
 
-        // TODO: test validations
+    /**
+     * Get box contents for a box by a unique identifier, from UTXO set and also the mempool.
+     *
+     * 
+     */
+    @Test
+    public void getBoxWithPoolByIdTest() throws IOException {
+        ErgoTransactionOutput response = api.getBoxWithPoolById(boxId).execute().body();
+        assertNotNull(response);
+        assertEquals(ergoTree, response.getErgoTree());
+    }
+
+    /**
+     * Get serialized box in Base16 encoding by an identifier, considering also the mempool.
+     *
+     * 
+     */
+    @Test
+    public void getBoxWithPoolByIdBinaryTest() throws IOException {
+        SerializedBox response = api.getBoxWithPoolByIdBinary(boxId).execute().body();
+        assertNotNull(response);
+        assertTrue(response.getBytes().length() > 10);
     }
 }

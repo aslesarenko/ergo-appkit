@@ -1,18 +1,26 @@
 package org.ergoplatform.restapi.client;
 
+import org.ergoplatform.restapi.client.ApiClient;
+import org.ergoplatform.restapi.client.AddressValidity;
+import org.ergoplatform.restapi.client.ApiError;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+
+import static org.junit.Assert.*;
+
 
 /**
  * API tests for UtilsApi
  */
-public class UtilsApiTest {
+public class UtilsApiTest extends PeerFinder {
 
     private UtilsApi api;
 
     @Before
     public void setup() {
-        api = new ApiClient("http://localhost:9052/").createService(UtilsApi.class);
+        api = findPeer(true).createService(UtilsApi.class);
     }
 
 
@@ -22,11 +30,14 @@ public class UtilsApiTest {
      * 
      */
     @Test
-    public void addressToRawTest() {
-        String address = null;
-        // String response = api.addressToRaw(address);
-
-        // TODO: test validations
+    public void addressToRawTest() throws IOException {
+        String response = api.addressToRaw(address).execute().body();
+        assertNotNull(response);
+        assertTrue(response.length() > 0);
+        assertEquals("{\n" +
+            "  \"raw\" : " +
+             "\"036ba5cfbc03ea2471fdf02737f64dbcd58c34461a7ec1e586dcd713dacbf89a12\"\n" +
+            "}", response);
     }
 
     /**
@@ -35,11 +46,11 @@ public class UtilsApiTest {
      * 
      */
     @Test
-    public void checkAddressValidityTest() {
-        String address = null;
-        // AddressValidity response = api.checkAddressValidity(address);
-
-        // TODO: test validations
+    public void checkAddressValidityTest() throws IOException {
+        AddressValidity response = api.checkAddressValidity(address).execute().body();
+        assertNotNull(response);
+        assertEquals(address, response.getAddress());
+        assertTrue(response.isIsValid());
     }
 
     /**
@@ -48,11 +59,10 @@ public class UtilsApiTest {
      * 
      */
     @Test
-    public void ergoTreeToAddressTest() {
-        String ergoTreeHex = null;
-        // String response = api.ergoTreeToAddress(ergoTreeHex);
-
-        // TODO: test validations
+    public void ergoTreeToAddressTest() throws IOException {
+        String response = api.ergoTreeToAddress(ergoTree).execute().body();
+        assertNotNull(response);
+        assertTrue(response.contains(address));
     }
 
     /**
@@ -61,10 +71,10 @@ public class UtilsApiTest {
      * 
      */
     @Test
-    public void getRandomSeedTest() {
-        // String response = api.getRandomSeed();
-
-        // TODO: test validations
+    public void getRandomSeedTest() throws IOException {
+        String response = api.getRandomSeed().execute().body();
+        assertNotNull(response);
+        assertTrue(response.length() > 1);
     }
 
     /**
@@ -73,11 +83,11 @@ public class UtilsApiTest {
      * 
      */
     @Test
-    public void getRandomSeedWithLengthTest() {
-        String length = null;
-        // String response = api.getRandomSeedWithLength(length);
-
-        // TODO: test validations
+    public void getRandomSeedWithLengthTest() throws IOException {
+        String length = "10";
+        String response = api.getRandomSeedWithLength(length).execute().body();
+        assertNotNull(response);
+        assertTrue(response.length() > 1);
     }
 
     /**
@@ -86,11 +96,10 @@ public class UtilsApiTest {
      * 
      */
     @Test
-    public void hashBlake2bTest() {
-        String body = null;
-        // String response = api.hashBlake2b(body);
-
-        // TODO: test validations
+    public void hashBlake2bTest() throws IOException {
+        String body = "\"hello\"";
+        String response = api.hashBlake2b(body).execute().body();
+        assertEquals("\"324dcf027dd4a30a932c441f365a25e86b173defa4b8e58948253471b81b72cf\"", response);
     }
 
     /**
@@ -99,10 +108,12 @@ public class UtilsApiTest {
      * 
      */
     @Test
-    public void rawToAddressTest() {
-        String pubkeyHex = null;
-        // String response = api.rawToAddress(pubkeyHex);
+    public void rawToAddressTest() throws IOException {
+        String pubkeyHex = "036ba5cfbc03ea2471fdf02737f64dbcd58c34461a7ec1e586dcd713dacbf89a12";
+        String response = api.rawToAddress(pubkeyHex).execute().body();
 
-        // TODO: test validations
+        assertEquals("{\n" +
+            "  \"address\" : \"9hHDQb26AjnJUXxcqriqY1mnhpLuUeC81C4pggtK7tupr92Ea1K\"\n" +
+            "}", response);
     }
 }

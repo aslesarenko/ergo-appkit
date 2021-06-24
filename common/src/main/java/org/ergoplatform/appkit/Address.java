@@ -27,7 +27,7 @@ public class Address {
     public Address(ErgoAddress ergoAddress) {
         _address = ergoAddress;
         ErgoAddressEncoder encoder =
-            ErgoAddressEncoder.apply(ergoAddress.addressTypePrefix());
+            ErgoAddressEncoder.apply(ergoAddress.networkPrefix());
         _base58String = encoder.toString(_address);
         _addrBytes = Base58.decode(_base58String).get();
     }

@@ -1,9 +1,18 @@
-package org.ergoplatform.restapi.client;
+package org.ergoplatform.restapi.client;//retrofit2
+
+import org.ergoplatform.restapi.client.CollectionFormats.*;
 
 import retrofit2.Call;
 import retrofit2.http.*;
 
-import java.util.List;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+
+import org.ergoplatform.restapi.client.ApiError;
+import org.ergoplatform.restapi.client.BlacklistedPeers;
+import org.ergoplatform.restapi.client.Peer;
+import org.ergoplatform.restapi.client.PeersStatus;
+
 
 public interface PeersApi {
   /**
@@ -23,28 +32,37 @@ public interface PeersApi {
   /**
    * Get all known peers
    * 
-   * @return Call&lt;List&lt;Peer&gt;&gt;
+   * @return Call&lt;java.util.List&lt;Peer&gt;&gt;
    */
   @GET("peers/all")
-  Call<List<Peer>> getAllPeers();
+  Call<java.util.List<Peer>> getAllPeers();
     
 
   /**
    * Get blacklisted peers
    * 
-   * @return Call&lt;List&lt;String&gt;&gt;
+   * @return Call&lt;BlacklistedPeers&gt;
    */
   @GET("peers/blacklisted")
-  Call<List<String>> getBlacklistedPeers();
+  Call<BlacklistedPeers> getBlacklistedPeers();
     
 
   /**
    * Get current connected peers
    * 
-   * @return Call&lt;List&lt;Peer&gt;&gt;
+   * @return Call&lt;java.util.List&lt;Peer&gt;&gt;
    */
   @GET("peers/connected")
-  Call<List<Peer>> getConnectedPeers();
+  Call<java.util.List<Peer>> getConnectedPeers();
+    
+
+  /**
+   * Get last incomming message timestamp and current network time
+   * 
+   * @return Call&lt;PeersStatus&gt;
+   */
+  @GET("peers/status")
+  Call<PeersStatus> getPeersStatus();
     
 
 }

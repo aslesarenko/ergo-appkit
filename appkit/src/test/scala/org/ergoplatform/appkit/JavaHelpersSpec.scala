@@ -7,6 +7,7 @@ import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import sigmastate.Values.{ByteArrayConstant, EvaluatedValue, IntConstant}
 import sigmastate.{SType, TrivialProp}
 import sigmastate.helpers.TestingHelpers._
+import org.ergoplatform.wallet.mnemonic.{Mnemonic => WMnemonic}
 
 class JavaHelpersSpec extends PropSpec with Matchers
     with ScalaCheckDrivenPropertyChecks
@@ -50,4 +51,16 @@ class JavaHelpersSpec extends PropSpec with Matchers
           ErgoValue.of(10), ErgoValue.of(Array[Byte](10, 20, 30))))
     }
   }
+
+  property("mnemonicToSeed") {
+    // check that bouncycastle-based implementation is equivalent to the
+    // original Java8-based implementation
+    forAll(MinSuccessful(50)) { (mnemonic: String, passOpt: Option[String]) =>
+      val seed = JavaHelpers.mnemonicToSeed(mnemonic, passOpt)
+      val expSeed = WMnemonic.toSeed(mnemonic, passOpt)
+      seed shouldBe expSeed
+      println(s"Mnemonic: $mnemonic, Password: $passOpt")
+    }
+  }
+
 }

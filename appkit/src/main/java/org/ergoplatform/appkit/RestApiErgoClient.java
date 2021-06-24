@@ -14,26 +14,38 @@ public class RestApiErgoClient implements ErgoClient {
     private final String _nodeUrl;
     private final NetworkType _networkType;
     private final ApiClient _client;
+    private final String _explorerUrl;
     private final ExplorerApiClient _explorer;
+
+    public final static String defaultMainnetExplorerUrl = "https://api.ergoplatform.com";
+    public final static String defaultTestnetExplorerUrl = "https://api-testnet.ergoplatform.com";
 
     /**
      * Create and initialize a new instance.
      *
-     * @param nodeUrl     http url to Ergo node REST API endpoint of the form `https://host:port/`.
+     * @param nodeUrl     http url to Ergo node REST API endpoint of the form
+     *                    `https://host[:port]` where port is optional.
      * @param networkType type of network (mainnet, testnet) the Ergo node is part of
      * @param apiKey      api key to authenticate this client
+     * @param explorerUrl http url to Ergo Explorer REST API endpoint of the
+     *                    form `https://host[:port]` where port is optional.
      */
-    RestApiErgoClient(String nodeUrl, NetworkType networkType, String apiKey) {
+    RestApiErgoClient(String nodeUrl, NetworkType networkType, String apiKey, String explorerUrl) {
         _nodeUrl = nodeUrl;
         _networkType = networkType;
         _client = new ApiClient(_nodeUrl, "ApiKeyAuth", apiKey);
-        switch (networkType) {
-        case MAINNET:
-            _explorer = new ExplorerApiClient("https://api.ergoplatform.com");
-            break;
-        default:
-            _explorer = new ExplorerApiClient("https://api-testnet.ergoplatform.com");
+        if (explorerUrl == null) {
+            switch (networkType) {
+            case MAINNET:
+                _explorerUrl = defaultMainnetExplorerUrl;
+                break;
+            default:
+                _explorerUrl = defaultTestnetExplorerUrl;
+            }
+        } else {
+            _explorerUrl = explorerUrl;
         }
+        _explorer = new ExplorerApiClient(_explorerUrl);
     }
 
     @Override
@@ -51,18 +63,19 @@ public class RestApiErgoClient implements ErgoClient {
      * @param apiKey      api key to authenticate this client
      * @return a new instance of {@link ErgoClient} connected to a given node
      */
-    public static ErgoClient create(String nodeUrl, NetworkType networkType, String apiKey) {
-        return new RestApiErgoClient(nodeUrl, networkType, apiKey);
+    public static ErgoClient create(String nodeUrl, NetworkType networkType, String apiKey, String explorerUrl) {
+        return new RestApiErgoClient(nodeUrl, networkType, apiKey, explorerUrl);
     }
 
     /**
      * Create a new {@link ErgoClient} instance using node configuration parameters.
      */
-    public static ErgoClient create(ErgoNodeConfig nodeConf) {
+    public static ErgoClient create(ErgoNodeConfig nodeConf, String explorerUrl) {
         return RestApiErgoClient.create(
                 nodeConf.getNodeApi().getApiUrl(),
                 nodeConf.getNetworkType(),
-                nodeConf.getNodeApi().getApiKey());
+                nodeConf.getNodeApi().getApiKey(),
+                explorerUrl);
     }
 
     /**
